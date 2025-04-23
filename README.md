@@ -37,8 +37,8 @@
 
 1.  **複製儲存庫 (Clone the repository):**
     ```bash
-    git clone <您的專案儲存庫網址>
-    cd <您的專案資料夾名稱>
+    git clone https://github.com/Yung-Chih-Lo/lucky_station.git
+    cd lucky_station
     ```
 2.  **安裝依賴套件 (Install dependencies):**
     請確保您已安裝 [Node.js](https://nodejs.org/) 和 npm 。
@@ -66,7 +66,7 @@ react-svg-map:https://github.com/VictorCazanave/svg-maps?tab=readme-ov-file
 
 ## 如何貢獻 (Contributing)
 
-如果您有任何建議或想為此專案貢獻，歡迎提交 [Issue](<您的專案儲存庫網址>/issues) 或發起 [Pull Request](<您的專案儲存庫網址>/pulls)。
+如果您有任何建議或想為此專案貢獻，歡迎提交 [Issue](https://github.com/Yung-Chih-Lo/lucky_station/issues) 或發起 [Pull Request](https://github.com/Yung-Chih-Lo/lucky_station/pulls)。
 
 ## 授權 (License)
 
