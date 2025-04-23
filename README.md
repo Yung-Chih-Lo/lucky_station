@@ -68,10 +68,3 @@ react-svg-map:https://github.com/VictorCazanave/svg-maps?tab=readme-ov-file
 
 如果您有任何建議或想為此專案貢獻，歡迎提交 [Issue](https://github.com/Yung-Chih-Lo/lucky_station/issues) 或發起 [Pull Request](https://github.com/Yung-Chih-Lo/lucky_station/pulls)。
 
-## 授權 (License)
-
-建議您為專案選擇一個開源授權，例如 MIT License。請在專案中添加一個 `LICENSE` 檔案並註明授權資訊。
-
----
-
-希望這個 README 檔案符合您的需求，並能清楚地向使用者介紹您的專案！
