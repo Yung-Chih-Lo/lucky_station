@@ -1,13 +1,12 @@
-// src/components/TaiwanSvgMap/TaiwanSvgMap.jsx
-import React, { useState } from 'react'; // Import useState
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
 import TaiwanMainMap from '@svg-maps/taiwan.main';
-import { SVGMap } from 'react-svg-map';
 import styled from 'styled-components';
 import { mapIdToChineseName } from '../constants/mapConstants';
 
-// 用來作為提示目前滑鼠停留的縣市中文名稱
 const Tooltip = styled.div`
-  position: absolute;
+  position: fixed;
   background-color: rgba(0, 0, 0, 0.75);
   color: white;
   padding: 4px 8px;
@@ -15,22 +14,21 @@ const Tooltip = styled.div`
   font-size: 12px;
   white-space: nowrap;
   z-index: 999;
-  pointer-events: none; // Prevent tooltip from interfering with mouse events
+  pointer-events: none;
   transition: opacity 0.1s ease-in-out;
-  opacity: ${props => props.$show ? 1 : 0}; // Use transient prop $show
+  opacity: ${props => props.$show ? 1 : 0};
 `;
 
 const MapWrapper = styled.div`
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-
-  max-height: 80vh; // Using the value from your provided code
+  max-height: 80vh;
   height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative; // Needed if Tooltip positioning is relative to wrapper
+  position: relative;
 
   svg {
     display: block;
@@ -43,7 +41,7 @@ const MapWrapper = styled.div`
       stroke: #ffffff;
       stroke-width: 1px;
       cursor: pointer;
-      transition: fill 0.2s ease-in-out, stroke 0.2s ease-in-out; // Added stroke transition
+      transition: fill 0.2s ease-in-out, stroke 0.2s ease-in-out;
 
       &:hover {
         fill: #c0c0c0;
@@ -54,26 +52,39 @@ const MapWrapper = styled.div`
       }
 
       &.disabled {
-         fill: #f5f5f5;
-         cursor: not-allowed;
-         &:hover {
-            fill: #f5f5f5;
-         }
+        fill: #f5f5f5;
+        cursor: not-allowed;
+        &:hover {
+          fill: #f5f5f5;
+        }
       }
 
-      /* Customized focus outline */
       &:focus {
-        outline: 2px solid; /* Example: Red solid outline */
+        outline: 2px solid;
         outline-offset: 1px;
       }
     }
   }
 `;
 
+// 動態載入 SVGMap，避免 react-svg-map 在 SSR 環境使用 React 16 內部 API 造成錯誤
+let SVGMapComponent = null;
 
 function TaiwanSvgMap({ selectedCounties = [], onMapClick, disabledCounties = [] }) {
-  // State for tracking hovered county and mouse position
-  const [hoveredCounty, setHoveredCounty] = useState(null); // { name: string, x: number, y: number } | null
+  const [hoveredCounty, setHoveredCounty] = useState(null);
+  const [SVGMap, setSVGMap] = useState(null);
+
+  // 客戶端才載入 react-svg-map（避免 SSR 相容性問題）
+  useEffect(() => {
+    if (!SVGMapComponent) {
+      import('react-svg-map').then(mod => {
+        SVGMapComponent = mod.SVGMap;
+        setSVGMap(() => mod.SVGMap);
+      });
+    } else {
+      setSVGMap(() => SVGMapComponent);
+    }
+  }, []);
 
   const getLocationClassName = (location) => {
     const mapId = location.id;
@@ -88,15 +99,13 @@ function TaiwanSvgMap({ selectedCounties = [], onMapClick, disabledCounties = []
     const targetPath = event.target.closest('path');
     const mapId = targetPath?.id;
     if (mapId) {
-        const chineseName = mapIdToChineseName[mapId];
-        // Removed console.log
-        if (chineseName && !disabledCounties.includes(chineseName) && onMapClick) {
-            onMapClick(chineseName);
-        }
+      const chineseName = mapIdToChineseName[mapId];
+      if (chineseName && !disabledCounties.includes(chineseName) && onMapClick) {
+        onMapClick(chineseName);
+      }
     }
   };
 
-  // Mouse hover event handlers
   const handleLocationMouseOver = (event) => {
     const targetPath = event.target.closest('path');
     const mapId = targetPath?.id;
@@ -105,8 +114,8 @@ function TaiwanSvgMap({ selectedCounties = [], onMapClick, disabledCounties = []
       if (chineseName) {
         setHoveredCounty({
           name: chineseName,
-          x: event.clientX, // Position relative to viewport
-          y: event.clientY, // Position relative to viewport
+          x: event.clientX,
+          y: event.clientY,
         });
       }
     }
@@ -117,25 +126,26 @@ function TaiwanSvgMap({ selectedCounties = [], onMapClick, disabledCounties = []
   };
 
   return (
-    <> {/* Use Fragment to render MapWrapper and Tooltip side-by-side */}
+    <>
       <MapWrapper>
-        <SVGMap
-          map={TaiwanMainMap}
-          locationClassName={getLocationClassName}
-          onLocationClick={handleLocationClick}
-          onLocationMouseOver={handleLocationMouseOver}
-          onLocationMouseOut={handleLocationMouseOut}
-        />
+        {SVGMap ? (
+          <SVGMap
+            map={TaiwanMainMap}
+            locationClassName={getLocationClassName}
+            onLocationClick={handleLocationClick}
+            onLocationMouseOver={handleLocationMouseOver}
+            onLocationMouseOut={handleLocationMouseOut}
+          />
+        ) : (
+          <div style={{ color: '#999', padding: '40px', textAlign: 'center' }}>地圖載入中...</div>
+        )}
       </MapWrapper>
-
-      {/* Conditionally render the Tooltip */}
       {hoveredCounty && (
         <Tooltip
-          $show={!!hoveredCounty} // Pass state to styled-component prop
+          $show={!!hoveredCounty}
           style={{
-            // Position tooltip near the cursor
-            top: `${hoveredCounty.y + 15}px`, // Offset slightly below cursor
-            left: `${hoveredCounty.x + 15}px`, // Offset slightly right of cursor
+            top: `${hoveredCounty.y + 15}px`,
+            left: `${hoveredCounty.x + 15}px`,
           }}
         >
           {hoveredCounty.name}
