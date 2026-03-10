@@ -27,11 +27,12 @@ export default function StatsPage() {
       title: '名次',
       key: 'rank',
       width: 70,
-      render: (_, __, index) => {
-        if (index < 3) {
-          return <TrophyOutlined style={{ color: medalColors[index], fontSize: 20 }} />;
+      render: (_, record) => {
+        const rank = record.globalRank;
+        if (rank < 3) {
+          return <TrophyOutlined style={{ color: medalColors[rank], fontSize: 20 }} />;
         }
-        return <Text type="secondary">{index + 1}</Text>;
+        return <Text type="secondary">{rank + 1}</Text>;
       },
     },
     {
@@ -76,9 +77,9 @@ export default function StatsPage() {
           </Text>
         ) : (
           <Table
-            dataSource={rankings.map((r, i) => ({ ...r, key: i }))}
+            dataSource={rankings.map((r, i) => ({ ...r, key: i, globalRank: i }))}
             columns={columns}
-            pagination={false}
+            pagination={{ pageSize: 10, showSizeChanger: false }}
             size="middle"
           />
         )}

@@ -2,20 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { Typography, Empty, message } from 'antd';
-import { GlobalOutlined, EnvironmentOutlined, ShareAltOutlined, CopyOutlined } from '@ant-design/icons';
+import { GlobalOutlined, EnvironmentOutlined, ShareAltOutlined, CopyOutlined, ReadOutlined } from '@ant-design/icons';
 import styled, { keyframes } from 'styled-components';
 
 const { Text } = Typography;
 
 const revealIn = keyframes`
-  from {
-    opacity: 0;
-    transform: scale(0.92);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
 `;
 
 const ResultContainer = styled.div`
@@ -66,11 +60,16 @@ const LinksContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px dashed rgba(14, 165, 233, 0.25);
+  margin-top: 16px;
   width: 100%;
   animation: ${revealIn} 0.4s ease 0.2s both;
+`;
+
+const Divider = styled.div`
+  width: 100%;
+  border-top: 1px dashed rgba(14, 165, 233, 0.25);
+  margin: 20px 0 16px;
+  animation: ${revealIn} 0.4s ease 0.25s both;
 `;
 
 const PillLink = styled.a`
@@ -85,6 +84,7 @@ const PillLink = styled.a`
   text-decoration: none;
   transition: all 0.2s ease;
   border: 1.5px solid;
+  cursor: pointer;
 
   ${props => props.$variant === 'wiki' ? `
     color: #0EA5E9;
@@ -108,9 +108,7 @@ const PillLink = styled.a`
     }
   `}
 
-  .anticon {
-    font-size: 15px;
-  }
+  .anticon { font-size: 15px; }
 `;
 
 const ShareBox = styled.div`
@@ -144,6 +142,24 @@ const CopyButton = styled.button`
   }
 `;
 
+const ExploreLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 14px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+  animation: ${revealIn} 0.4s ease 0.4s both;
+  cursor: pointer;
+
+  &:hover { color: var(--color-primary); }
+`;
+
+/* ─────────────────────────────────── */
+
 const pickRandomStationName = (data) => {
   if (!data || Object.keys(data).length === 0) return '載入中...';
   const counties = Object.keys(data);
@@ -153,7 +169,7 @@ const pickRandomStationName = (data) => {
   return stationsInCounty[Math.floor(Math.random() * stationsInCounty.length)];
 };
 
-function ResultDisplay({ station, allStationsData, token }) {
+function ResultDisplay({ station, allStationsData, token, onExternalLinkClick }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [displayStationName, setDisplayStationName] = useState('');
   const [messageApi, contextHolder] = message.useMessage();
@@ -186,15 +202,9 @@ function ResultDisplay({ station, allStationsData, token }) {
     };
   }, [station, allStationsData]);
 
-  if (!station && !isAnimating) {
-    return (
-      <ResultContainer>
-        <Empty description="尚未抽取目的地" image={Empty.PRESENTED_IMAGE_SIMPLE} />
-      </ResultContainer>
-    );
-  }
-
-  const commentUrl = token ? `${typeof window !== 'undefined' ? window.location.origin : ''}/comment?token=${token}` : null;
+  const commentUrl = token
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/comment?token=${token}`
+    : null;
 
   const handleCopyLink = () => {
     if (commentUrl) {
@@ -204,9 +214,24 @@ function ResultDisplay({ station, allStationsData, token }) {
     }
   };
 
+  // 點擊外部連結：交由 MainApp 決定是否顯示警告 modal
+  const handleLinkClick = (e, url) => {
+    e.preventDefault();
+    onExternalLinkClick?.(url);
+  };
+
+  if (!station && !isAnimating) {
+    return (
+      <ResultContainer>
+        <Empty description="尚未抽取目的地" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      </ResultContainer>
+    );
+  }
+
   return (
     <ResultContainer>
       {contextHolder}
+
       <StationInfo $isAnimating={isAnimating}>
         <StationName $isAnimating={isAnimating}>
           「{displayStationName}」{isAnimating ? '' : '車站'}
@@ -225,6 +250,7 @@ function ResultDisplay({ station, allStationsData, token }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 $variant="wiki"
+                onClick={(e) => handleLinkClick(e, `https://zh.wikipedia.org/wiki/${station.name}車站`)}
               >
                 <GlobalOutlined />
                 維基百科
@@ -232,10 +258,11 @@ function ResultDisplay({ station, allStationsData, token }) {
             )}
             {station.county && station.name && (
               <PillLink
-                href={`http://maps.google.com/maps?q=${station.county}${station.name}台鐵車站`}
+                href={`https://maps.google.com/maps?q=${station.county}${station.name}台鐵車站`}
                 target="_blank"
                 rel="noopener noreferrer"
                 $variant="maps"
+                onClick={(e) => handleLinkClick(e, `https://maps.google.com/maps?q=${station.county}${station.name}台鐵車站`)}
               >
                 <EnvironmentOutlined />
                 Google Map
@@ -243,28 +270,47 @@ function ResultDisplay({ station, allStationsData, token }) {
             )}
           </LinksContainer>
 
+          <Divider />
+
           {commentUrl && (
-            <ShareBox>
-              <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginBottom: '8px', fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)' }}>
+            <>
+              <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginBottom: '4px', fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)' }}>
                 <ShareAltOutlined /> 旅行完畢後，用以下連結分享你的心得：
               </Text>
-              <Text
-                style={{
-                  fontSize: '11px',
-                  wordBreak: 'break-all',
-                  color: 'var(--color-primary)',
-                  display: 'block',
-                  marginBottom: '10px',
-                  fontFamily: 'var(--font-body)',
-                }}
-              >
-                {commentUrl}
+              <Text style={{ fontSize: '12px', display: 'block', marginBottom: '10px', fontFamily: 'var(--font-body)', color: '#F97316', fontWeight: 600 }}>
+                ⚠️ 此連結僅能使用一次，請務必保存！
               </Text>
-              <CopyButton onClick={handleCopyLink}>
-                <CopyOutlined />
-                複製連結
-              </CopyButton>
-            </ShareBox>
+              <ShareBox>
+                <Text
+                  style={{
+                    fontSize: '11px',
+                    wordBreak: 'break-all',
+                    color: 'var(--color-primary)',
+                    display: 'block',
+                    marginBottom: '5px',
+                    fontFamily: 'var(--font-body)',
+                  }}
+                >
+                  {commentUrl}
+                </Text>
+                <CopyButton onClick={handleCopyLink} style={{ width: '100%', justifyContent: 'center' }}>
+                  <CopyOutlined />
+                  複製連結
+                </CopyButton>
+              </ShareBox>
+            </>
+          )}
+
+          {station.name && (
+            <ExploreLink
+              href={`/explore?station=${encodeURIComponent(station.name)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => handleLinkClick(e, `/explore?station=${encodeURIComponent(station.name)}`)}
+            >
+              <ReadOutlined />
+              查看其他旅人在「{station.name}」的故事
+            </ExploreLink>
           )}
         </>
       )}

@@ -20,7 +20,9 @@ export async function POST(request) {
       return NextResponse.json({ error: '無效的車站名稱' }, { status: 400 });
     }
 
-    // 取得客戶端 IP（Cloudflare 提供的 CF-Connecting-IP 不可被客戶端偽造）
+    // 取得客戶端 IP
+    // cf-connecting-ip：由 Cloudflare 注入，客戶端無法偽造（生產環境）
+    // x-forwarded-for：僅作為本機開發 fallback，正式部署必須經 Cloudflare 代理
     const ip =
       request.headers.get('cf-connecting-ip') ||
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
@@ -30,7 +32,7 @@ export async function POST(request) {
     const { allowed } = checkRateLimit(ip);
     if (!allowed) {
       return NextResponse.json(
-        { error: '你今天已經抽太多次囉！請稍後再試。' },
+        { error: '你這分鐘已經抽太多次囉！請稍後再試。' },
         { status: 429 }
       );
     }

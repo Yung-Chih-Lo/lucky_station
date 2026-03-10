@@ -1,15 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button, Typography, Modal } from 'antd';
+import { Button, Modal, message } from 'antd';
+import { CopyOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import Sidebar from './Sidebar';
 import TaiwanSvgMap from './TaiwanSvgMap';
 import ResultDisplay from './ResultDisplay';
 import { getRandomStation } from '../utils/stationUtils';
 import stationsData from '../constants/stations.json';
-
-const { Title } = Typography;
 
 const AppContainer = styled.div`
   display: flex;
@@ -112,6 +111,68 @@ export default function MainApp() {
   const [titleIndex, setTitleIndex] = useState(0);
   const [currentToken, setCurrentToken] = useState(null);
   const [isPicking, setIsPicking] = useState(false);
+  const [warnVisible, setWarnVisible] = useState(false);
+  const [warnMode, setWarnMode] = useState('close'); // 'close' | 'link'
+  const [pendingLinkUrl, setPendingLinkUrl] = useState(null);
+  const [linkWarnedOnce, setLinkWarnedOnce] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const commentUrl = currentToken
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/comment?token=${currentToken}`
+    : null;
+
+  // X 按鈕：有 token 才攔截
+  const handleModalClose = () => {
+    if (currentToken) {
+      setWarnMode('close');
+      setWarnVisible(true);
+    } else {
+      setIsResultModalVisible(false);
+    }
+  };
+
+  // 外部連結點擊（由 ResultDisplay 呼叫）：同一次抽站只警告一次
+  const handleExternalLinkClick = (url) => {
+    if (currentToken && !linkWarnedOnce) {
+      setWarnMode('link');
+      setPendingLinkUrl(url);
+      setWarnVisible(true);
+    } else {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  // 警告 modal 確認
+  const handleWarnConfirm = () => {
+    setWarnVisible(false);
+    setCopySuccess(false);
+    if (warnMode === 'close') {
+      setIsResultModalVisible(false);
+      setCurrentToken(null);
+      setLinkWarnedOnce(false);
+    } else {
+      setLinkWarnedOnce(true);
+      if (pendingLinkUrl) window.open(pendingLinkUrl, '_blank', 'noopener,noreferrer');
+      setPendingLinkUrl(null);
+    }
+  };
+
+  // 警告 modal 取消
+  const handleWarnCancel = () => {
+    setWarnVisible(false);
+    if (warnMode === 'link') setPendingLinkUrl(null);
+  };
+
+  const handleCopyInWarning = () => {
+    if (commentUrl) {
+      navigator.clipboard.writeText(commentUrl).then(() => {
+        setCopySuccess(true);
+        messageApi.success('連結已複製！');
+        setTimeout(() => setCopySuccess(false), 3000);
+      });
+    }
+  };
 
   const handleSelectionChange = (countyOrList) => {
     if (Array.isArray(countyOrList)) {
@@ -138,6 +199,7 @@ export default function MainApp() {
     setRandomStation(station);
     setTitleIndex(prev => (prev + 1) % modalTitles.length);
     setIsResultModalVisible(true);
+    setLinkWarnedOnce(false);
 
     // 非同步記錄抽站並取得 token（不阻擋 UI）
     try {
@@ -159,6 +221,7 @@ export default function MainApp() {
 
   return (
     <AppContainer>
+      {contextHolder}
       <SidebarArea>
         <Sidebar
           selectedCounties={selectedCounties}
@@ -188,7 +251,8 @@ export default function MainApp() {
           </span>
         }
         open={isResultModalVisible}
-        onCancel={() => setIsResultModalVisible(false)}
+        onCancel={handleModalClose}
+        maskClosable={false}
         footer={null}
         centered
         styles={{
@@ -211,9 +275,60 @@ export default function MainApp() {
             station={randomStation}
             allStationsData={stationsData}
             token={currentToken}
+            onExternalLinkClick={handleExternalLinkClick}
           />
         )}
       </Modal>
+
+      {/* 統一的心得連結警告 modal（關閉 / 外部連結點擊共用） */}
+      <Modal
+        open={warnVisible}
+        onCancel={handleWarnCancel}
+        footer={null}
+        centered
+        width={380}
+        styles={{ body: { padding: '24px 24px 20px' } }}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 44, lineHeight: 1, marginBottom: 14 }}>🔖</div>
+          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 17, fontWeight: 700, color: 'var(--color-text)', marginBottom: 6 }}>
+            {warnMode === 'close' ? '關閉前，請先保存心得連結！' : '出發前，請先保存心得連結！'}
+          </div>
+          <div style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: '#F97316', fontWeight: 500, marginBottom: 20 }}>
+            ⚠️ 此連結僅能使用一次，旅行回來才能留言
+          </div>
+          <div style={{ background: 'rgba(14,165,233,0.06)', border: '1px solid rgba(14,165,233,0.25)', borderRadius: 10, padding: '12px 14px', marginBottom: 20, textAlign: 'left' }}>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--color-primary)', wordBreak: 'break-all', lineHeight: 1.6, marginBottom: 10 }}>
+              {commentUrl}
+            </div>
+            <button
+              onClick={handleCopyInWarning}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 16px', borderRadius: 16, border: '1.5px solid var(--color-primary)', background: copySuccess ? 'var(--color-primary)' : 'transparent', color: copySuccess ? '#fff' : 'var(--color-primary)', fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 500, cursor: 'pointer', width: '100%', justifyContent: 'center', transition: 'all 0.2s ease' }}
+            >
+              <CopyOutlined /> {copySuccess ? '已複製！' : '複製連結'}
+            </button>
+          </div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <Button
+              size="large"
+              style={{ flex: 1, fontFamily: 'var(--font-body)' }}
+              onClick={handleWarnCancel}
+            >
+              {warnMode === 'close' ? '留在這裡' : '等等，先複製'}
+            </Button>
+            <Button
+              size="large"
+              type={warnMode === 'close' ? 'default' : 'primary'}
+              danger={warnMode === 'close'}
+              style={{ flex: 1, fontFamily: 'var(--font-body)' }}
+              onClick={handleWarnConfirm}
+            >
+              {warnMode === 'close' ? '確認關閉' : '繼續前往'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
     </AppContainer>
   );
 }

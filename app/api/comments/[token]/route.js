@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDB } from '../../../../lib/db.js';
+import { checkCommentRateLimit } from '../../../../lib/rateLimit.js';
 
 // GET /api/comments/[token] — 取得 token 對應的車站資訊
 export async function GET(request, { params }) {
@@ -48,6 +49,20 @@ export async function POST(request, { params }) {
     }
     if (trimmed.length > 500) {
       return NextResponse.json({ error: '留言不能超過 500 個字' }, { status: 400 });
+    }
+
+    // 取得客戶端 IP（與 /api/pick 相同邏輯，生產環境須經 Cloudflare 代理）
+    const ip =
+      request.headers.get('cf-connecting-ip') ||
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      '127.0.0.1';
+
+    const { allowed } = checkCommentRateLimit(ip);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: '你今天已經留言太多次了！請稍後再試。' },
+        { status: 429 }
+      );
     }
 
     const db = getDB();

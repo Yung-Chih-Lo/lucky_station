@@ -1,11 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Typography } from 'antd';
+import { useSearchParams } from 'next/navigation';
 import BackButton from '../../components/BackButton';
 import CommentList from '../../components/CommentList';
 
 const { Title, Text } = Typography;
+
+function ExploreContent() {
+  const searchParams = useSearchParams();
+  const stationFromUrl = searchParams.get('station') || '';
+
+  return <CommentList stationFilter={stationFromUrl} />;
+}
 
 export default function ExplorePage() {
   return (
@@ -19,7 +27,9 @@ export default function ExplorePage() {
         每一段旅程都值得被記錄，每一個車站都有屬於它的故事
       </Text>
 
-      <CommentList />
+      <Suspense fallback={null}>
+        <ExploreContent />
+      </Suspense>
     </div>
   );
 }

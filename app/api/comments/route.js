@@ -7,7 +7,7 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const station = searchParams.get('station') || '';
-    const search = searchParams.get('search') || '';
+    const search = (searchParams.get('search') || '').slice(0, 100);
     const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
     const limit = Math.min(parseInt(searchParams.get('limit') || String(PAGE_SIZE), 10), 50);
     const offset = (page - 1) * limit;

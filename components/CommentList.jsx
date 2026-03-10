@@ -129,7 +129,10 @@ export default function CommentList({ initialComments, initialTotal, stationFilt
                   {formatDate(comment.created_at)}
                 </Text>
               </CardMeta>
-              <Paragraph style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
+              <Paragraph
+                style={{ margin: 0, whiteSpace: 'pre-wrap' }}
+                ellipsis={{ rows: 4, expandable: true, symbol: '展開全文' }}
+              >
                 {comment.content}
               </Paragraph>
             </CommentCard>
