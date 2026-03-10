@@ -5,8 +5,9 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import {
   Typography, Form, Input, Button, Alert, Card, Tag, Divider, Spin, message
 } from 'antd';
-import { HomeOutlined, EnvironmentOutlined, SendOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, SendOutlined } from '@ant-design/icons';
 import Link from 'next/link';
+import BackButton from '../../components/BackButton';
 import CommentList from '../../components/CommentList';
 
 const { Title, Text, Paragraph } = Typography;
@@ -106,11 +107,7 @@ function CommentPageContent() {
     <div style={{ maxWidth: 680, margin: '0 auto', padding: '32px 16px' }}>
       {contextHolder}
 
-      <div style={{ marginBottom: 16 }}>
-        <Link href="/" style={{ color: '#1890ff' }}>
-          <HomeOutlined /> 回首頁
-        </Link>
-      </div>
+      <BackButton />
 
       <Title level={2} style={{ textAlign: 'center', marginBottom: 24 }}>
         ✍️ 分享你的旅行心得

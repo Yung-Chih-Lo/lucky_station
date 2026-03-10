@@ -2,26 +2,54 @@
 
 import React, { useState } from 'react';
 import TaiwanMainMap from '@svg-maps/taiwan.main';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { mapIdToChineseName } from '../constants/mapConstants';
+
+const mapFadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+`;
 
 const Tooltip = styled.div`
   position: fixed;
-  background-color: rgba(0, 0, 0, 0.75);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--color-text);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: var(--font-heading);
+  font-weight: 500;
   white-space: nowrap;
   z-index: 999;
   pointer-events: none;
-  transition: opacity 0.1s ease-in-out;
+  border: 1px solid rgba(14, 165, 233, 0.25);
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.15);
+  transition: opacity 0.15s ease-in-out;
   opacity: ${props => props.$show ? 1 : 0};
+`;
+
+const MapCard = styled.div`
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(14, 165, 233, 0.12);
+  padding: 16px;
+  animation: ${mapFadeIn} 0.6s ease both;
 `;
 
 const MapWrapper = styled.div`
   width: 100%;
-  max-width: 600px;
+  max-width: 560px;
   margin: 0 auto;
   max-height: 80vh;
   height: auto;
@@ -37,30 +65,33 @@ const MapWrapper = styled.div`
     max-height: 100%;
 
     path {
-      fill: #e0e0e0;
+      fill: #7DD3FC;
       stroke: #ffffff;
-      stroke-width: 1px;
+      stroke-width: 1.5px;
       cursor: pointer;
-      transition: fill 0.2s ease-in-out, stroke 0.2s ease-in-out;
+      transition: fill 0.2s ease-in-out, filter 0.2s ease-in-out;
 
       &:hover {
-        fill: #c0c0c0;
+        fill: #38BDF8;
+        filter: drop-shadow(0 2px 6px rgba(14, 165, 233, 0.3));
       }
 
       &.selected {
-        fill: #1890ff;
+        fill: #0EA5E9;
+        filter: drop-shadow(0 2px 8px rgba(14, 165, 233, 0.5));
       }
 
       &.disabled {
-        fill: #f5f5f5;
+        fill: #E0F2FE;
         cursor: not-allowed;
         &:hover {
-          fill: #f5f5f5;
+          fill: #E0F2FE;
+          filter: none;
         }
       }
 
       &:focus {
-        outline: 2px solid;
+        outline: 2px solid var(--color-primary);
         outline-offset: 1px;
       }
     }
@@ -104,28 +135,30 @@ function TaiwanSvgMap({ selectedCounties = [], onMapClick, disabledCounties = []
 
   return (
     <>
-      <MapWrapper>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox={TaiwanMainMap.viewBox}
-          aria-label={TaiwanMainMap.label}
-          onClick={handleLocationClick}
-          onMouseOver={handleLocationMouseOver}
-          onMouseOut={handleLocationMouseOut}
-        >
-          {TaiwanMainMap.locations.map((location) => (
-            <path
-              key={location.id}
-              id={location.id}
-              name={location.name}
-              d={location.path}
-              className={getLocationClassName(location)}
-              aria-label={location.name}
-              tabIndex={0}
-            />
-          ))}
-        </svg>
-      </MapWrapper>
+      <MapCard>
+        <MapWrapper>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox={TaiwanMainMap.viewBox}
+            aria-label={TaiwanMainMap.label}
+            onClick={handleLocationClick}
+            onMouseOver={handleLocationMouseOver}
+            onMouseOut={handleLocationMouseOut}
+          >
+            {TaiwanMainMap.locations.map((location) => (
+              <path
+                key={location.id}
+                id={location.id}
+                name={location.name}
+                d={location.path}
+                className={getLocationClassName(location)}
+                aria-label={location.name}
+                tabIndex={0}
+              />
+            ))}
+          </svg>
+        </MapWrapper>
+      </MapCard>
       {hoveredCounty && (
         <Tooltip
           $show={!!hoveredCounty}

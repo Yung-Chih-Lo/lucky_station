@@ -19,7 +19,13 @@
       "Bash(node -e \"console.log\\(require\\(''./node_modules/next/dist/compiled/react/cjs/react.development.js''\\).version\\)\")",
       "Bash(find /Users/yung/Desktop/workspace/python/lucky_station -maxdepth 1 -name .env* -o -name *.env)",
       "Bash(xargs ls:*)",
-      "Bash(find /Users/yung/Desktop/workspace/python/lucky_station -maxdepth 3 -name *.db -o -name *.sqlite*)"
+      "Bash(find /Users/yung/Desktop/workspace/python/lucky_station -maxdepth 3 -name *.db -o -name *.sqlite*)",
+      "Bash(find /Users/yung/Desktop/workspace/python/lucky_station/src -type f -name \"*.jsx\" -o -name \"*.js\" 2>/dev/null | head -20)",
+      "Bash(python3 .claude/skills/ui-ux-pro-max/scripts/search.py \"taiwan railway travel cultural regional interactive map picker\" --design-system -p \"Lucky Station\" -f markdown 2>&1)",
+      "Bash(python3 .claude/skills/ui-ux-pro-max/scripts/search.py \"animation interactive map taiwan cultural\" --domain ux 2>&1)",
+      "Bash(python3 .claude/skills/ui-ux-pro-max/scripts/search.py \"travel cultural taiwan\" --domain style 2>&1)",
+      "Bash(python3 .claude/skills/ui-ux-pro-max/scripts/search.py \"minimalist glassmorphism elegant\" --domain style 2>&1)",
+      "Bash(npm run:*)"
     ]
   }
 }

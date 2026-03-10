@@ -15,6 +15,7 @@ const AppContainer = styled.div`
   display: flex;
   min-height: 100vh;
   flex-direction: row;
+  background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-end) 100%);
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -22,18 +23,22 @@ const AppContainer = styled.div`
 `;
 
 const SidebarArea = styled.div`
-  background-color: #fff;
-  box-shadow: 2px 0 6px rgba(0, 21, 41, 0.08);
+  background: rgba(255, 255, 255, var(--glass-opacity));
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  border-right: var(--border-glass);
+  box-shadow: var(--shadow-glass);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   width: 280px;
+  animation: fadeInUp 0.5s ease both;
 
   @media (max-width: 768px) {
     width: 100%;
     height: auto;
-    box-shadow: none;
-    border-bottom: 1px solid #d9d9d9;
+    border-right: none;
+    border-bottom: var(--border-glass);
     order: 2;
   }
 `;
@@ -41,10 +46,11 @@ const SidebarArea = styled.div`
 const MainArea = styled.div`
   flex-grow: 1;
   padding: 24px;
-  background-color: #f0f2f5;
+  background: transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: fadeInUp 0.5s ease 0.1s both;
 
   @media (max-width: 768px) {
     padding: 16px;
@@ -58,6 +64,35 @@ const NavBar = styled.div`
   justify-content: flex-end;
   gap: 8px;
   margin-bottom: 16px;
+`;
+
+const NavLink = styled.a`
+  color: var(--color-primary);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 14px;
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(14, 165, 233, 0.25);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+
+  &:hover {
+    background: rgba(14, 165, 233, 0.1);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+`;
+
+const MapTitle = styled.h3`
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: center;
+  margin-bottom: 24px;
 `;
 
 const modalTitles = [
@@ -136,12 +171,10 @@ export default function MainApp() {
 
       <MainArea>
         <NavBar>
-          <Button type="link" href="/stats">📊 抽站排行</Button>
-          <Button type="link" href="/explore">💬 旅人心得</Button>
+          <NavLink href="/stats">📊 抽站排行</NavLink>
+          <NavLink href="/explore">💬 旅人心得</NavLink>
         </NavBar>
-        <Title level={3} style={{ marginBottom: '24px', color: '#595959', textAlign: 'center' }}>
-          點選地圖或勾選縣市來決定範圍
-        </Title>
+        <MapTitle>點選地圖或勾選縣市來決定範圍</MapTitle>
         <TaiwanSvgMap
           selectedCounties={selectedCounties}
           onMapClick={handleSelectionChange}
@@ -150,14 +183,28 @@ export default function MainApp() {
 
       <Modal
         title={
-          <Title level={4} style={{ textAlign: 'center', margin: 0 }}>
+          <span style={{ fontFamily: 'var(--font-heading)', fontSize: '18px', fontWeight: 600, color: 'var(--color-text)', display: 'block', textAlign: 'center' }}>
             {modalTitles[titleIndex]}
-          </Title>
+          </span>
         }
         open={isResultModalVisible}
         onCancel={() => setIsResultModalVisible(false)}
         footer={null}
         centered
+        styles={{
+          content: {
+            background: 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderRadius: '20px',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
+            boxShadow: '0 20px 60px rgba(14, 165, 233, 0.25)',
+          },
+          header: {
+            background: 'transparent',
+            borderBottom: '1px solid rgba(14, 165, 233, 0.15)',
+          },
+        }}
       >
         {isResultModalVisible && (
           <ResultDisplay

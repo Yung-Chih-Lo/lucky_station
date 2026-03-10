@@ -2,8 +2,7 @@
 
 import React from 'react';
 import { Typography } from 'antd';
-import { HomeOutlined } from '@ant-design/icons';
-import Link from 'next/link';
+import BackButton from '../../components/BackButton';
 import CommentList from '../../components/CommentList';
 
 const { Title, Text } = Typography;
@@ -11,11 +10,7 @@ const { Title, Text } = Typography;
 export default function ExplorePage() {
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 16px' }}>
-      <div style={{ marginBottom: 16 }}>
-        <Link href="/" style={{ color: '#1890ff' }}>
-          <HomeOutlined /> 回首頁
-        </Link>
-      </div>
+      <BackButton />
 
       <Title level={2} style={{ textAlign: 'center', marginBottom: 8 }}>
         💬 旅人心得

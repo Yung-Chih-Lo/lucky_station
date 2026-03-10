@@ -1,21 +1,34 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Typography, Empty, Button, message } from 'antd';
+import { Typography, Empty, message } from 'antd';
 import { GlobalOutlined, EnvironmentOutlined, ShareAltOutlined, CopyOutlined } from '@ant-design/icons';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
+
+const revealIn = keyframes`
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+`;
 
 const ResultContainer = styled.div`
   text-align: center;
-  padding: 30px 20px;
-  background-color: #f0f2f5;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
+  padding: 36px 24px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 20px 60px rgba(14, 165, 233, 0.25);
+  max-width: 420px;
   margin: 0 auto;
-  border: 1px solid #d9d9d9;
   min-height: 200px;
   display: flex;
   flex-direction: column;
@@ -23,8 +36,28 @@ const ResultContainer = styled.div`
   align-items: center;
 `;
 
+const StationName = styled.div`
+  font-family: var(--font-heading);
+  font-size: ${props => props.$isAnimating ? '28px' : '36px'};
+  font-weight: 700;
+  color: ${props => props.$isAnimating ? 'var(--color-secondary)' : 'var(--color-primary)'};
+  margin-bottom: 4px;
+  transition: font-size 0.3s ease, color 0.3s ease;
+  animation: ${props => !props.$isAnimating ? revealIn : 'none'} 0.4s ease both;
+  opacity: ${props => props.$isAnimating ? 0.75 : 1};
+  letter-spacing: 2px;
+`;
+
+const CountyLabel = styled.div`
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+  animation: ${revealIn} 0.4s ease 0.1s both;
+`;
+
 const StationInfo = styled.div`
-  margin-bottom: ${props => props.$isAnimating ? '0' : '24px'};
+  margin-bottom: ${props => props.$isAnimating ? '0' : '16px'};
   transition: margin-bottom 0.5s ease-in-out;
   min-height: 60px;
 `;
@@ -32,39 +65,83 @@ const StationInfo = styled.div`
 const LinksContainer = styled.div`
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 12px;
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px dashed #d9d9d9;
+  border-top: 1px dashed rgba(14, 165, 233, 0.25);
   width: 100%;
+  animation: ${revealIn} 0.4s ease 0.2s both;
 `;
 
-const StyledLink = styled.a`
-  display: flex;
+const PillLink = styled.a`
+  display: inline-flex;
   align-items: center;
-  color: #1890ff;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 24px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: all 0.2s ease;
+  border: 1.5px solid;
 
-  &:hover {
-    color: #40a9ff;
-    text-decoration: underline;
-  }
+  ${props => props.$variant === 'wiki' ? `
+    color: #0EA5E9;
+    border-color: #0EA5E9;
+    background: rgba(14, 165, 233, 0.06);
+    &:hover {
+      background: #0EA5E9;
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35);
+    }
+  ` : `
+    color: #F97316;
+    border-color: #F97316;
+    background: rgba(249, 115, 22, 0.06);
+    &:hover {
+      background: #F97316;
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+    }
+  `}
 
   .anticon {
-    margin-right: 6px;
-    font-size: 16px;
+    font-size: 15px;
   }
 `;
 
 const ShareBox = styled.div`
   margin-top: 20px;
-  padding: 12px 16px;
-  background: #e6f7ff;
-  border: 1px solid #91d5ff;
-  border-radius: 6px;
+  padding: 14px 16px;
+  background: rgba(14, 165, 233, 0.08);
+  border: 1px solid rgba(14, 165, 233, 0.25);
+  border-radius: 12px;
   width: 100%;
   text-align: left;
+  animation: ${revealIn} 0.4s ease 0.3s both;
+`;
+
+const CopyButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+  font-family: var(--font-body);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--color-primary);
+    color: #fff;
+  }
 `;
 
 const pickRandomStationName = (data) => {
@@ -131,56 +208,62 @@ function ResultDisplay({ station, allStationsData, token }) {
     <ResultContainer>
       {contextHolder}
       <StationInfo $isAnimating={isAnimating}>
-        <Title level={2} style={{ marginBottom: '4px', color: '#1890ff' }}>
+        <StationName $isAnimating={isAnimating}>
           「{displayStationName}」{isAnimating ? '' : '車站'}
-        </Title>
-        {!isAnimating && station && <Text type="secondary">{station.county}</Text>}
+        </StationName>
+        {!isAnimating && station && (
+          <CountyLabel>{station.county}</CountyLabel>
+        )}
       </StationInfo>
 
       {!isAnimating && station && (
         <>
           <LinksContainer>
             {station.name && (
-              <StyledLink
+              <PillLink
                 href={`https://zh.wikipedia.org/wiki/${station.name}車站`}
                 target="_blank"
                 rel="noopener noreferrer"
+                $variant="wiki"
               >
                 <GlobalOutlined />
                 維基百科
-              </StyledLink>
+              </PillLink>
             )}
             {station.county && station.name && (
-              <StyledLink
+              <PillLink
                 href={`http://maps.google.com/maps?q=${station.county}${station.name}台鐵車站`}
                 target="_blank"
                 rel="noopener noreferrer"
+                $variant="maps"
               >
                 <EnvironmentOutlined />
                 Google Map
-              </StyledLink>
+              </PillLink>
             )}
           </LinksContainer>
 
           {commentUrl && (
             <ShareBox>
-              <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginBottom: '8px' }}>
+              <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginBottom: '8px', fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)' }}>
                 <ShareAltOutlined /> 旅行完畢後，用以下連結分享你的心得：
               </Text>
               <Text
                 style={{
                   fontSize: '11px',
                   wordBreak: 'break-all',
-                  color: '#1890ff',
+                  color: 'var(--color-primary)',
                   display: 'block',
-                  marginBottom: '8px',
+                  marginBottom: '10px',
+                  fontFamily: 'var(--font-body)',
                 }}
               >
                 {commentUrl}
               </Text>
-              <Button size="small" icon={<CopyOutlined />} onClick={handleCopyLink}>
+              <CopyButton onClick={handleCopyLink}>
+                <CopyOutlined />
                 複製連結
-              </Button>
+              </CopyButton>
             </ShareBox>
           )}
         </>

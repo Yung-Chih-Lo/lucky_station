@@ -1,3 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap');
+
+:root {
+  --color-primary: #0EA5E9;
+  --color-secondary: #38BDF8;
+  --color-cta: #F97316;
+  --color-bg-start: #F0F9FF;
+  --color-bg-end: #BAE6FD;
+  --color-text: #0C4A6E;
+  --color-text-muted: #0369A1;
+  --blur-amount: 15px;
+  --glass-opacity: 0.65;
+  --border-glass: 1px solid rgba(255, 255, 255, 0.4);
+  --shadow-glass: 0 8px 32px rgba(14, 165, 233, 0.15);
+  --border-radius-card: 16px;
+  --font-heading: 'Noto Serif TC', serif;
+  --font-body: 'Noto Sans TC', sans-serif;
+}
+
 *,
 *::before,
 *::after {
@@ -7,6 +26,29 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    'Noto Sans', 'Noto Sans CJK TC', sans-serif;
+  font-family: var(--font-body);
+  background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-end) 100%);
+  color: var(--color-text);
+  min-height: 100vh;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Typography, Table, Tag, Spin } from 'antd';
-import { TrophyOutlined, HomeOutlined } from '@ant-design/icons';
-import Link from 'next/link';
+import { TrophyOutlined } from '@ant-design/icons';
+import BackButton from '../../components/BackButton';
 
 const { Title, Text } = Typography;
 
@@ -60,11 +60,7 @@ export default function StatsPage() {
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 16px' }}>
-      <div style={{ marginBottom: 16 }}>
-        <Link href="/" style={{ color: '#1890ff' }}>
-          <HomeOutlined /> 回首頁
-        </Link>
-      </div>
+      <BackButton />
 
       <Title level={2} style={{ textAlign: 'center', marginBottom: 8 }}>
         🏆 抽站排行榜
