@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import TaiwanMainMap from '@svg-maps/taiwan.main';
 import styled from 'styled-components';
 import { mapIdToChineseName } from '../constants/mapConstants';
@@ -67,28 +67,11 @@ const MapWrapper = styled.div`
   }
 `;
 
-// 動態載入 SVGMap，避免 react-svg-map 在 SSR 環境使用 React 16 內部 API 造成錯誤
-let SVGMapComponent = null;
-
 function TaiwanSvgMap({ selectedCounties = [], onMapClick, disabledCounties = [] }) {
   const [hoveredCounty, setHoveredCounty] = useState(null);
-  const [SVGMap, setSVGMap] = useState(null);
-
-  // 客戶端才載入 react-svg-map（避免 SSR 相容性問題）
-  useEffect(() => {
-    if (!SVGMapComponent) {
-      import('react-svg-map').then(mod => {
-        SVGMapComponent = mod.SVGMap;
-        setSVGMap(() => mod.SVGMap);
-      });
-    } else {
-      setSVGMap(() => SVGMapComponent);
-    }
-  }, []);
 
   const getLocationClassName = (location) => {
-    const mapId = location.id;
-    const chineseName = mapIdToChineseName[mapId];
+    const chineseName = mapIdToChineseName[location.id];
     if (!chineseName) return '';
     if (disabledCounties.includes(chineseName)) return 'disabled';
     if (selectedCounties.includes(chineseName)) return 'selected';
@@ -96,8 +79,7 @@ function TaiwanSvgMap({ selectedCounties = [], onMapClick, disabledCounties = []
   };
 
   const handleLocationClick = (event) => {
-    const targetPath = event.target.closest('path');
-    const mapId = targetPath?.id;
+    const mapId = event.target.closest('path')?.id;
     if (mapId) {
       const chineseName = mapIdToChineseName[mapId];
       if (chineseName && !disabledCounties.includes(chineseName) && onMapClick) {
@@ -107,16 +89,11 @@ function TaiwanSvgMap({ selectedCounties = [], onMapClick, disabledCounties = []
   };
 
   const handleLocationMouseOver = (event) => {
-    const targetPath = event.target.closest('path');
-    const mapId = targetPath?.id;
+    const mapId = event.target.closest('path')?.id;
     if (mapId) {
       const chineseName = mapIdToChineseName[mapId];
       if (chineseName) {
-        setHoveredCounty({
-          name: chineseName,
-          x: event.clientX,
-          y: event.clientY,
-        });
+        setHoveredCounty({ name: chineseName, x: event.clientX, y: event.clientY });
       }
     }
   };
@@ -128,17 +105,26 @@ function TaiwanSvgMap({ selectedCounties = [], onMapClick, disabledCounties = []
   return (
     <>
       <MapWrapper>
-        {SVGMap ? (
-          <SVGMap
-            map={TaiwanMainMap}
-            locationClassName={getLocationClassName}
-            onLocationClick={handleLocationClick}
-            onLocationMouseOver={handleLocationMouseOver}
-            onLocationMouseOut={handleLocationMouseOut}
-          />
-        ) : (
-          <div style={{ color: '#999', padding: '40px', textAlign: 'center' }}>地圖載入中...</div>
-        )}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox={TaiwanMainMap.viewBox}
+          aria-label={TaiwanMainMap.label}
+          onClick={handleLocationClick}
+          onMouseOver={handleLocationMouseOver}
+          onMouseOut={handleLocationMouseOut}
+        >
+          {TaiwanMainMap.locations.map((location) => (
+            <path
+              key={location.id}
+              id={location.id}
+              name={location.name}
+              d={location.path}
+              className={getLocationClassName(location)}
+              aria-label={location.name}
+              tabIndex={0}
+            />
+          ))}
+        </svg>
       </MapWrapper>
       {hoveredCounty && (
         <Tooltip

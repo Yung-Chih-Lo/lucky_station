@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\(''''peerDeps:'''', json.dumps\\(p.get\\(''''peerDependencies'''',{}\\), indent=2\\)\\)\")",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\(''''deps:'''', p.get\\(''''dependencies'''',{}\\)\\); print\\(''''peerDeps:'''', p.get\\(''''peerDependencies'''',{}\\)\\)\")",
+      "Bash(node -e \"const m = require\\(''/Users/yung/Desktop/workspace/python/lucky_station/node_modules/@svg-maps/taiwan.main''\\); console.log\\(JSON.stringify\\({viewBox: m.viewBox, label: m.label, locationsCount: m.locations.length, firstLocation: m.locations[0]}\\)\\)\")",
+      "Bash(node -e \"const m = require\\(''/Users/yung/Desktop/workspace/python/lucky_station/node_modules/@svg-maps/taiwan.main''\\); console.log\\(Object.keys\\(m\\)\\); console.log\\(JSON.stringify\\(m\\).slice\\(0,500\\)\\)\")"
+    ]
+  }
+}
