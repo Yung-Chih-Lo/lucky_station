@@ -23,6 +23,7 @@ function CommentPageContent() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [content, setContent] = useState('');
+  const [honeypot, setHoneypot] = useState('');
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
@@ -63,7 +64,7 @@ function CommentPageContent() {
       const res = await fetch(`/api/comments/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: trimmed, honeypot: '' }),
+        body: JSON.stringify({ content: trimmed, honeypot }),
       });
       const data = await res.json();
 
@@ -151,6 +152,8 @@ function CommentPageContent() {
           <input
             type="text"
             name="website"
+            value={honeypot}
+            onChange={e => setHoneypot(e.target.value)}
             style={{ display: 'none' }}
             tabIndex={-1}
             autoComplete="off"

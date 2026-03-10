@@ -16,7 +16,10 @@
       "Bash(find node_modules -name package.json -path */react/package.json)",
       "Bash(node -e \"const r = require\\(''''./node_modules/react/package.json''''\\); console.log\\(r.version\\)\")",
       "Bash(node -e \"const r = require\\(''./node_modules/next/dist/compiled/react/package.json''\\); console.log\\(''Next.js bundled React:'', r.version\\)\")",
-      "Bash(node -e \"console.log\\(require\\(''./node_modules/next/dist/compiled/react/cjs/react.development.js''\\).version\\)\")"
+      "Bash(node -e \"console.log\\(require\\(''./node_modules/next/dist/compiled/react/cjs/react.development.js''\\).version\\)\")",
+      "Bash(find /Users/yung/Desktop/workspace/python/lucky_station -maxdepth 1 -name .env* -o -name *.env)",
+      "Bash(xargs ls:*)",
+      "Bash(find /Users/yung/Desktop/workspace/python/lucky_station -maxdepth 3 -name *.db -o -name *.sqlite*)"
     ]
   }
 }
