@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import {
   Typography, Form, Input, Button, Alert, Card, Tag, Divider, Spin, message
 } from 'antd';
-import { EnvironmentOutlined, SendOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, SendOutlined, ShareAltOutlined, CopyOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import BackButton from '../../components/BackButton';
 import CommentList from '../../components/CommentList';
@@ -75,8 +75,6 @@ function CommentPageContent() {
       }
 
       setSubmitted(true);
-      // 2 秒後導向 /explore
-      setTimeout(() => router.push('/explore'), 2000);
     } catch {
       messageApi.error('網路錯誤，請稍後再試。');
     } finally {
@@ -137,11 +135,29 @@ function CommentPageContent() {
           }
         />
       ) : submitted ? (
-        <Alert
-          type="success"
-          message="留言已送出！正在跳轉到旅人心得頁面..."
-          showIcon
-        />
+        <Card style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>🎉</div>
+          <Title level={4} style={{ marginBottom: 4 }}>留言已送出！</Title>
+          <Text type="secondary" style={{ display: 'block', marginBottom: 20 }}>
+            把你的旅遊故事分享給朋友，讓更多人來探索 {pickInfo.station_name} 車站吧！
+          </Text>
+          <Button
+            type="primary"
+            icon={<ShareAltOutlined />}
+            size="large"
+            block
+            style={{ marginBottom: 12 }}
+            onClick={() => {
+              const url = `${window.location.origin}/explore?station=${encodeURIComponent(pickInfo.station_name)}`;
+              navigator.clipboard.writeText(url).then(() => messageApi.success('連結已複製！'));
+            }}
+          >
+            <CopyOutlined /> 複製「{pickInfo.station_name}車站」故事頁連結
+          </Button>
+          <Button block onClick={() => router.push(`/explore?station=${encodeURIComponent(pickInfo.station_name)}`)}>
+            查看所有人在 {pickInfo.station_name} 的故事
+          </Button>
+        </Card>
       ) : (
         /* 留言表單 */
         <Card title="寫下你的故事">
