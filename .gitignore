@@ -1,3 +1,12 @@
+# Next.js
+.next/
+out/
+
+# SQLite DB（本地開發用，生產環境由 Zeabur volume 提供）
+*.db
+*.db-shm
+*.db-wal
+
 # Logs
 logs
 *.log
