@@ -7,7 +7,7 @@ import Sidebar from './Sidebar';
 import TaiwanSvgMap from './TaiwanSvgMap';
 import ResultDisplay from './ResultDisplay';
 import { getRandomStation } from '../utils/stationUtils';
-import stationsData from '../data/stations.json';
+import stationsData from '../constants/stations.json';
 
 const { Title } = Typography;
 

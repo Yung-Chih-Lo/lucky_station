@@ -141,7 +141,7 @@ function Sidebar({ selectedCounties = [], onChange, traStationsData = {}, onRand
         footer={null}
         width={600}
       >
-        {Object.entries(traStationsData).map(([county, stations]) => (
+        {Object.entries(traStationsData ?? {}).map(([county, stations]) => (
           <div key={county} style={{ marginBottom: '12px' }}>
             <Text strong>{county}:</Text>
             <br />

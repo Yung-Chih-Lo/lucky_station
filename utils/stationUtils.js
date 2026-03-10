@@ -1,5 +1,5 @@
 // src/utils/stationUtils.js
-import stationsData from '../data/stations.json';
+import stationsData from '../constants/stations.json';
 
 /**
  * 從 JSON 資料中獲取所有縣市的列表

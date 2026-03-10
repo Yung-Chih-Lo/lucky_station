@@ -5,7 +5,18 @@
       "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\(''''peerDeps:'''', json.dumps\\(p.get\\(''''peerDependencies'''',{}\\), indent=2\\)\\)\")",
       "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\(''''deps:'''', p.get\\(''''dependencies'''',{}\\)\\); print\\(''''peerDeps:'''', p.get\\(''''peerDependencies'''',{}\\)\\)\")",
       "Bash(node -e \"const m = require\\(''/Users/yung/Desktop/workspace/python/lucky_station/node_modules/@svg-maps/taiwan.main''\\); console.log\\(JSON.stringify\\({viewBox: m.viewBox, label: m.label, locationsCount: m.locations.length, firstLocation: m.locations[0]}\\)\\)\")",
-      "Bash(node -e \"const m = require\\(''/Users/yung/Desktop/workspace/python/lucky_station/node_modules/@svg-maps/taiwan.main''\\); console.log\\(Object.keys\\(m\\)\\); console.log\\(JSON.stringify\\(m\\).slice\\(0,500\\)\\)\")"
+      "Bash(node -e \"const m = require\\(''/Users/yung/Desktop/workspace/python/lucky_station/node_modules/@svg-maps/taiwan.main''\\); console.log\\(Object.keys\\(m\\)\\); console.log\\(JSON.stringify\\(m\\).slice\\(0,500\\)\\)\")",
+      "Bash(node -e \"const r = require\\(''./node_modules/react/package.json''\\); console.log\\(''React:'', r.version\\)\")",
+      "Bash(node -e \"const n = require\\(''./node_modules/next/package.json''\\); console.log\\(''Next.js:'', n.version\\)\")",
+      "Bash(node -e \"const a = require\\(''./node_modules/antd/package.json''\\); console.log\\(''antd:'', a.version\\)\")",
+      "Bash(grep -r 'antd: compatible' node_modules/antd/lib/ --include=*.js -l)",
+      "Bash(find /Users/yung/Desktop/workspace/python/lucky_station -maxdepth 3 -not -path */node_modules/* -not -path */.next/* -not -path */.git/*)",
+      "Bash(node -e \"const n = require\\(''./node_modules/next/package.json''\\); console.log\\(''peerDeps:'', JSON.stringify\\(n.peerDependencies, null, 2\\)\\)\")",
+      "Bash(grep -r 'React is 16' node_modules/ -l --include=*.js)",
+      "Bash(find node_modules -name package.json -path */react/package.json)",
+      "Bash(node -e \"const r = require\\(''''./node_modules/react/package.json''''\\); console.log\\(r.version\\)\")",
+      "Bash(node -e \"const r = require\\(''./node_modules/next/dist/compiled/react/package.json''\\); console.log\\(''Next.js bundled React:'', r.version\\)\")",
+      "Bash(node -e \"console.log\\(require\\(''./node_modules/next/dist/compiled/react/cjs/react.development.js''\\).version\\)\")"
     ]
   }
 }
