@@ -1,3 +1,5 @@
+目前該專案已經關閉，請前往 [新專案](https://github.com/Yung-Chih-Lo/lucky_station_new)
+
 # 坐火行 (chò-hué kiânn) 🚆
 
 ## 專案概述 (Project Overview)
